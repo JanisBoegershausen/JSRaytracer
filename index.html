@@ -1,0 +1,97 @@
+<head>
+  <title>Raytracer</title>
+
+  <link rel="stylesheet" href="https://janisboegershausen.github.io/main.css" />
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+
+  <script language="javascript" type="text/javascript" src="https://janisboegershausen.github.io/SyntaxHighlighter.js"></script>
+  <script language="javascript" type="text/javascript" src="js/Color.js"></script>
+  <script language="javascript" type="text/javascript" src="js/Vector.js"></script>
+  <script language="javascript" type="text/javascript" src="js/RayHitInfo.js"></script>
+  <script language="javascript" type="text/javascript" src="js/Triangle.js"></script>
+  <script language="javascript" type="text/javascript" src="js/Shapes.js"></script>
+  <script language="javascript" type="text/javascript" src="js/EnviromentTexture.js"></script>
+  <script language="javascript" type="text/javascript" src="js/RayTracer.js"></script>
+
+  <script>
+    // Run code stylizer once the code has loaded
+    window.addEventListener("load", SyntaxHighlightElementsOnPage);
+  </script>
+</head>
+
+<body>
+  <returnHomeButton onclick="window.open('https://janisboegershausen.github.io/');">Home</returnHomeButton>
+  <headline> Raytracer </headline>
+  <textSection> A simple <coloredText style="color: tomato">(WIP)</coloredText> raytracer written in javascript. Press enter to start a new render. </textSection>
+  <textSection>
+    Canvas
+    <div style="width: 500px; height: 500px; margin: auto" id="rayTracer-canvas"></div>
+  </textSection>
+  <textSection>
+    Info
+    <div style="font-size: 20px; margin-top: 10px">
+      This is a simple raytracer written in JavaScript. You can check out the sourcecode
+      <a href="https://github.com/JanisBoegershausen/JanisBoegershausen.github.io/tree/master/projects/jsRayTracer">HERE</a>.
+      <br />
+      More features will come soon. So far this only renders two triangles using Web-Workers. I plan to add shading and reflections soon.
+    </div>
+  </textSection>
+  <textSection>
+    Tiling & Web-Workers
+    <div style="font-size: 20px; margin-top: 10px">
+      Tiling describes splitting the image into multiple smaller rectangles and rendering them seperatly. This allows us to render the image using paralelism. Right now, the ammount of tiles is set to 4x4, so 16 tiles in total. <br />
+      For each of these tiles, a webworker is created, that renders the dedicated section and sends it back to the main script.
+    </div>
+  </textSection>
+  <textSection>
+    Enviroment
+    <div style="font-size: 20px; margin-top: 10px">
+      Since I became a bit bored of the empty background behind the square, I implemented a skybox. <br />
+      To achieve this, each ray that does not hit a triangle, samples an HDRI, which is loaded in advance <br />
+      and the data is send to all of the workers. <br />
+      <br />
+      The sampling is done by converting the direction of a ray to UVs through calculating the around the y axis and the y component of the direction:
+      <br />
+      <div class="codeSection">
+Sample(direction) {
+  // Normalize direction
+  direction = direction.normalized();
+
+  // Calculate angle around the Y Axis using formula for angles of 2d vectors. This way we ignore the z component completly. 
+  var a = direction.x * Vector.forward.x + direction.z * Vector.forward.z;
+  var b = Math.sqrt(Math.pow(direction.x, 2) + Math.pow(direction.z, 2)) * Math.sqrt(Math.pow(Vector.forward.x, 2) + Math.pow(Vector.forward.z, 2));
+  var angleAlongY = a / b;
+  angleAlongY = Math.acos(angleAlongY);
+
+  // Convert angle from radians to degrees
+  angleAlongY = angleAlongY * (180 / Math.PI);
+
+  // Make angle go from 0 to 360 clockwise instead of from 0 to 180 in both directions
+  if (direction.x < 0) {
+    angleAlongY = angleAlongY * -1 + 360;
+  }
+
+  // Calculate uv in range from 0 to 1
+  var uv = {
+    x: angleAlongY / 360,
+    y: (direction.y + 1) / 2, // This might cause distortion towards the horizon
+  };
+
+  // Calculate textureCoordinate in range from 0 to width/height
+  var textureCoordinate = {
+    x: Math.floor(uv.x * this.width),
+    y: Math.floor(uv.y * this.height),
+  };
+
+  // Return the sampled color
+  return this.pixels[textureCoordinate.x][textureCoordinate.y];
+}
+      </div>
+      <br />
+      This is the used HDRI from
+      <a href="https://polyhaven.com/hdris">Polyhaven</a>:
+    </div>
+    <img id="hdri" src="assets/enviromentTexture_1.jpg" />
+  </textSection>
+</body>
