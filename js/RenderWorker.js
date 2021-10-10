@@ -1,5 +1,8 @@
 // Import required scripts
-importScripts("Mathmatics.js", "Vector.js", "Color.js", "Triangle.js", "RayHitInfo.js", "EnviromentTexture.js");
+importScripts("https://janisboegershausen.github.io/CommonUtilities.js/Mathmatics.js", 
+              "https://janisboegershausen.github.io/CommonUtilities.js/Vector3.js", 
+              "https://janisboegershausen.github.io/CommonUtilities.js/Color.js", 
+              "Triangle.js", "RayHitInfo.js", "EnviromentTexture.js");
 
 // Settings contains all data the worker needs for rendering
 settings = {
@@ -30,9 +33,9 @@ self.addEventListener("message", (e) => {
   } else if (e.data.type == "StartLoop") {
     // Start rendering loop. Random delay, so that the workers always complete their area at different
     // times and dont block each other when sending the pixels to the main script.
-    setTimeout(StartRenderLoop, random(0, 50));
+    setTimeout(StartRenderLoop, RandomInRange(0, 50));
   } else if (e.data.type == "RenderOnce") {
-    setTimeout(RenderFrame, random(0, 50));
+    setTimeout(RenderFrame, RandomInRange(0, 50));
   } else if (e.data.type == "SetTriangles") {
     SetTrianglesFromObjArray(e.data.triangles);
   } else if (e.data.type == "SetCamData") {
