@@ -1,14 +1,9 @@
 function Square(a, b, c, d, name) {
   var triangles = [];
   
-  triangles.push(new Triangle(a, b, d, { r: 255, g: 0, b: 0, a: 255 }, name));
-  triangles.push(new Triangle(b, c, d, { r: 0, g: 255, b: 0, a: 255 }, name));
-
-  var color = Color.Random();
-
-  for(var i = 0; i < triangles.length; i++) {
-    triangles[i].color = color;
-  }
+  var material = Material.Random();
+  triangles.push(new Triangle(a, b, d, material, name));
+  triangles.push(new Triangle(b, c, d, material, name));
 
   return triangles;
 }

@@ -100,22 +100,18 @@ function RenderPixel(x, y) {
   // Get the direciton vector for the current pixel on the screen
   var origin = settings.camPos;
   var direction = GetRayDirection(uv.x, uv.y);
-  var color = null;
 
   // Trace the pixel and return the resulting color. The pixel at x=250 and y=400 is beeing logged to the console.
-  return Trace(origin, direction, color, 0, x == 250 && y == 400);
+  return Trace(origin, direction, 0, x == 250 && y == 400);
 }
 
 // Traces a ray based on settings and returns color
-function Trace(origin, direction, inputColor, iteration, debugLog) {
+function Trace(origin, direction, iteration, debugLog) {
   // Cast a ray from the origin into the direction
   var hit = CastRay(origin, direction);
 
   // Calculate the color of the ray
-  var hitColor = hit != null ? hit.triangle.color : settings.enviromentTexture.Sample(direction);
-
-  // Mix hitColor with input color
-  var newColor = inputColor != null ? Color.Mix(inputColor, hitColor, 0.5) : hitColor;
+  var rayColor = hit != null ? hit.triangle.material.color : settings.enviromentTexture.Sample(direction);
 
   // For debugging. This allows printing the path of a single traced pixel
   if (debugLog) {
@@ -124,6 +120,9 @@ function Trace(origin, direction, inputColor, iteration, debugLog) {
       direction: direction,
       hit: hit
     });
+
+    // Color the pixel we are debugging red
+    rayColor = Color.Red;
   }
 
   // Reflection using recusion
@@ -131,16 +130,13 @@ function Trace(origin, direction, inputColor, iteration, debugLog) {
     // Calculate the reflection rays direction
     var newDirection = Vector.Reflect(direction, hit.triangle.GetNormal()).normalized();
     // Trace the reflection and mix the current color with the refleciton color
-    newColor = Color.Mix(newColor, Trace(hit.point, newDirection, newColor, iteration + 1, debugLog), (1 / (iteration + 1)) * 0.5); // Mix less and less each iteration
+    var reflectionRayColor = Trace(hit.point, newDirection, iteration + 1, debugLog);
+    // Return the mix between the ray and the reflection color based on the triangles roughness
+    return Color.Mix(rayColor, reflectionRayColor, 1 - hit.triangle.material.roughness);
+  } else {
+    // If nothing was hit or this was the last bounce, just return the hit color
+    return rayColor;
   }
-
-  // Turn the pixel we are debugging red
-  if (debugLog) {
-    newColor = new Color(255, 0, 0, 255);
-  }
-
-  // Return mixed color
-  return newColor;
 }
 
 // Cast a ray from an origin in a given direction. If it hits the triangle, returns the hitPoint, otherwise returns null.

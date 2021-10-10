@@ -1,10 +1,10 @@
 class Triangle {
-  constructor(a, b, c, color, name) {
+  constructor(a, b, c, material, name) {
     this.p0 = a;
     this.p1 = b;
     this.p2 = c;
 
-    this.color = color;
+    this.material = material;
     this.name = name;
   }
 
