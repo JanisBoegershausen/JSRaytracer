@@ -1,8 +1,5 @@
 // Import required scripts
-importScripts("https://janisboegershausen.github.io/CommonUtilities.js/Mathmatics.js", 
-              "https://janisboegershausen.github.io/CommonUtilities.js/Vector3.js", 
-              "https://janisboegershausen.github.io/CommonUtilities.js/Color.js", 
-              "Triangle.js", "RayHitInfo.js", "EnviromentTexture.js");
+importScripts("https://janisboegershausen.github.io/CommonUtilities.js/Mathmatics.js", "https://janisboegershausen.github.io/CommonUtilities.js/Vector3.js", "https://janisboegershausen.github.io/CommonUtilities.js/Color.js", "Triangle.js", "RayHitInfo.js", "EnviromentTexture.js");
 
 // Settings contains all data the worker needs for rendering
 settings = {
@@ -11,6 +8,8 @@ settings = {
 
   // List of triangles to be rendered (updated by RayTracer)
   triangles: [],
+
+  testingLightPos: new Vector(0, 0.5, -1.5),
 
   // Camera settings (updated by RayTracer)
   camPos: null,
@@ -118,25 +117,41 @@ function Trace(origin, direction, iteration, debugLog) {
     console.log({
       origin: origin,
       direction: direction,
-      hit: hit
+      hit: hit,
     });
 
     // Color the pixel we are debugging red
     rayColor = Color.Red;
   }
 
+  var tracedColor;
+
   // Reflection using recusion
-  if (hit != null && iteration < settings.bounces) {
-    // Calculate the reflection rays direction
-    var newDirection = Vector.Reflect(direction, hit.triangle.GetNormal()).normalized();
-    // Trace the reflection and mix the current color with the refleciton color
-    var reflectionRayColor = Trace(hit.point, newDirection, iteration + 1, debugLog);
-    // Return the mix between the ray and the reflection color based on the triangles roughness
-    return Color.Mix(rayColor, reflectionRayColor, 1 - hit.triangle.material.roughness);
+  if (hit != null) {
+    if (iteration < settings.bounces) {
+      // Calculate the reflection rays direction
+      var newDirection = Vector.Reflect(direction, hit.triangle.GetNormal()).normalized();
+      // Trace the reflection and mix the current color with the refleciton color
+      var reflectionRayColor = Trace(hit.point, newDirection, iteration + 1, debugLog);
+      // Return the mix between the ray and the reflection color based on the triangles roughness
+      tracedColor = Color.Mix(rayColor, reflectionRayColor, 1 - hit.triangle.material.roughness);
+    } else {
+      // If this was the last bounce, set the traced color to the ray color, without tracing reflections
+      tracedColor = rayColor;
+    }
   } else {
-    // If nothing was hit or this was the last bounce, just return the hit color
+    // If nothing was hit, just return the enviroment color
     return rayColor;
   }
+
+  // Cast a ray from the testing light source to the point in space we are calculating the lighting for
+  var lightingRayDirection = Vector.Sub(hit.point, settings.testingLightPos).normalized();
+  var lightingRayOrigin = settings.testingLightPos;
+  var lightingRayHit = CastRay(lightingRayOrigin, lightingRayDirection);
+  // If the ray detects something between the light and the point, set point is not lit. If nothing is in the way, the point is lit by the light. 
+  var lightLevel = (lightingRayHit == null || lightingRayHit.distance + 0.001 >= Vector.Distance(hit.point, settings.testingLightPos)) ? 1 : 0.5;
+  // Mix the traced color with black, based on the ammount of light at the point
+  return Color.Mix(new Color(0, 0, 0, 255), tracedColor, lightLevel);
 }
 
 // Cast a ray from an origin in a given direction. If it hits the triangle, returns the hitPoint, otherwise returns null.
@@ -153,13 +168,13 @@ function CastRay(origin, direction) {
     var triangleNormal = settings.triangles[i].GetNormal();
 
     // Only draw triangles that are facing the camera
-    if (true || Vector.Dot(direction, triangleNormal) > 0) {
-     var t = 0;
+    if (Vector.Dot(direction, triangleNormal) > 0) {
+      var t = 0;
 
       var denom = Vector.Dot(triangleNormal, direction);
-      if(denom > 0.00001) {
-        t = Vector.Dot(Vector.Sub(settings.triangles[0].p0, origin), triangleNormal) / denom;
-      } 
+      if (denom > 0.0001) {
+        t = Vector.Dot(Vector.Sub(settings.triangles[i].p0, origin), triangleNormal) / denom;
+      }
 
       // Checks if the ray hits the triangle infront of the camera and not behind it
       if (t > 0 && Math.abs(t) < Math.abs(currentHitDistance)) {
@@ -167,7 +182,7 @@ function CastRay(origin, direction) {
         var hitPoint = Vector.Add(origin, Vector.Scale(direction, t));
         // Check if the point on the plane we intersected is inside the tringle
         if (InsideOutsideTest(settings.triangles[i], hitPoint)) {
-          rayHitInfo = new RayHitInfo(settings.triangles[i], hitPoint);
+          rayHitInfo = new RayHitInfo(settings.triangles[i], hitPoint, t);
           currentHitDistance = t;
         }
       }

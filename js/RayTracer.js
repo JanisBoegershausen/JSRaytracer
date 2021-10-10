@@ -24,23 +24,23 @@ function setup() {
   enviromentTexture.LoadFromImage("hdri");
 
   // Set the camera position to the center of the world
-  camPos = new Vector(0, 1, 0);
+  camPos = new Vector(0, 1, 1);
 
   // Square facing camera
   triangles = triangles.concat(Square(new Vector(-1, 0, -3), new Vector(-1, 1, -4), new Vector(1, 1, -4), new Vector(1, 0, -3), "Facing Camera"));
   // Square facing right
-  triangles = triangles.concat(Square(new Vector(1, 0, 0), new Vector(1, 2, 0), new Vector(1, 2, -3), new Vector(1, 0, -3), "Facing Right"));
+  triangles = triangles.concat(Square(new Vector(-1, 0, 0), new Vector(-1, 2, 0), new Vector(-1, 2, -3), new Vector(-1, 0, -3), "Facing Right"));
   // Square facing left
   triangles = triangles.concat(Square(new Vector(1, 0, -2), new Vector(1, 1, -2), new Vector(2, 1, -1), new Vector(2, 0, -1), "Facing Left"));
   // Create ground plane
-  var groundY = -1;
-  triangles = triangles.concat(Square(new Vector(-3, groundY, -3), new Vector(3, groundY, -3), new Vector(3, groundY, 3), new Vector(-3, groundY, 3), "Ground"));
+  var groundY = 0;
+  triangles = triangles.concat(Square(new Vector(-30, groundY, -30), new Vector(30, groundY, -30), new Vector(30, groundY, 30), new Vector(-30, groundY, 30), "Ground"));
   
   // Create one worker for each tile
-  var tileWidth = Math.floor(resolution.x / verticalTileCount);
-  var tileHeight = Math.floor(resolution.y / horizontalTileCount);
+  var tileWidth = Math.floor(resolution.x / horizontalTileCount);
+  var tileHeight = Math.floor(resolution.y / verticalTileCount);
   for (var x = 0; x < horizontalTileCount; x += 1) {
-    for (var y = 0; y < horizontalTileCount; y += 1) {
+    for (var y = 0; y < verticalTileCount; y += 1) {
       CreateWorker(Math.floor(x * tileWidth), Math.floor(y * tileHeight), tileWidth, tileHeight);
     }
   }

@@ -7,6 +7,6 @@ class Material {
     static Mirror = new Material(new Color(0, 0, 0, 255), 0);
 
     static Random() {
-        return new Material(Color.Random(), RandomInRange(0, 1));
+        return new Material(Color.Random(), RandomInRange(0.25, 1));
     }
 }
