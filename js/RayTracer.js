@@ -4,6 +4,8 @@ var resolution = { x: 500, y: 500 };
 // List of all triangles that are rendered
 var triangles = [];
 
+var sceneLights = [];
+
 // Camera settings and data
 var camPos = null;
 var cameraFovMult = 1.5;
@@ -35,7 +37,10 @@ function setup() {
   // Create ground plane
   var groundY = 0;
   triangles = triangles.concat(Square(new Vector(-30, groundY, -30), new Vector(30, groundY, -30), new Vector(30, groundY, 30), new Vector(-30, groundY, 30), "Ground"));
-  
+
+  // Create light
+  sceneLights.push(new Light(new Vector(0, 0.5, -1.5), 1));
+
   // Create one worker for each tile
   var tileWidth = Math.floor(resolution.x / horizontalTileCount);
   var tileHeight = Math.floor(resolution.y / verticalTileCount);
@@ -102,6 +107,12 @@ function CreateWorker(x, y, w, h) {
   worker.postMessage({
     type: "SetTriangles",
     triangles: triangles,
+  });
+
+  // Send the lights to the worker
+  worker.postMessage({
+    type: "SetLights",
+    lights: sceneLights,
   });
 
   // Send the camera data to the worker

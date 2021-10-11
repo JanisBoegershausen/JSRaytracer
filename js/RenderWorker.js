@@ -1,5 +1,8 @@
 // Import required scripts
-importScripts("https://janisboegershausen.github.io/CommonUtilities.js/Mathmatics.js", "https://janisboegershausen.github.io/CommonUtilities.js/Vector3.js", "https://janisboegershausen.github.io/CommonUtilities.js/Color.js", "Triangle.js", "RayHitInfo.js", "EnviromentTexture.js");
+importScripts("https://janisboegershausen.github.io/CommonUtilities.js/Mathmatics.js", 
+              "https://janisboegershausen.github.io/CommonUtilities.js/Vector3.js", 
+              "https://janisboegershausen.github.io/CommonUtilities.js/Color.js", 
+              "Triangle.js", "Light.js", "RayHitInfo.js", "EnviromentTexture.js");
 
 // Settings contains all data the worker needs for rendering
 settings = {
@@ -9,7 +12,7 @@ settings = {
   // List of triangles to be rendered (updated by RayTracer)
   triangles: [],
 
-  testingLightPos: new Vector(0, 0.5, -1.5),
+  lights: [],
 
   // Camera settings (updated by RayTracer)
   camPos: null,
@@ -37,6 +40,8 @@ self.addEventListener("message", (e) => {
     setTimeout(RenderFrame, RandomInRange(0, 50));
   } else if (e.data.type == "SetTriangles") {
     SetTrianglesFromObjArray(e.data.triangles);
+  }else if (e.data.type == "SetLights") {
+    SetLightsFromObjArray(e.data.lights);
   } else if (e.data.type == "SetCamData") {
     settings.camPos = e.data.camPos;
     settings.cameraFovMult = e.data.cameraFovMult;
@@ -60,6 +65,14 @@ function SetTrianglesFromObjArray(objArray) {
   settings.triangles = [];
   for (var i = 0; i < objArray.length; i += 1) {
     settings.triangles.push(Object.assign(new Triangle(), objArray[i]));
+  }
+}
+
+// Since objects loose their type when send to a worker, restore the type of the light and store them in the lights array.
+function SetLightsFromObjArray(objArray) {
+  settings.lights = [];
+  for (var i = 0; i < objArray.length; i += 1) {
+    settings.lights.push(Object.assign(new Light(), objArray[i]));
   }
 }
 
@@ -144,14 +157,18 @@ function Trace(origin, direction, iteration, debugLog) {
     return rayColor;
   }
 
-  // Cast a ray from the testing light source to the point in space we are calculating the lighting for
-  var lightingRayDirection = Vector.Sub(hit.point, settings.testingLightPos).normalized();
-  var lightingRayOrigin = settings.testingLightPos;
+  // Cast a ray from the light source to the point in space we are calculating the lighting for
+  var lightingRayDirection = Vector.Sub(hit.point, settings.lights[0].position).normalized();
+  var lightingRayOrigin = settings.lights[0].position;
   var lightingRayHit = CastRay(lightingRayOrigin, lightingRayDirection);
-  // If the ray detects something between the light and the point, set point is not lit. If nothing is in the way, the point is lit by the light. 
-  var lightLevel = (lightingRayHit == null || lightingRayHit.distance + 0.001 >= Vector.Distance(hit.point, settings.testingLightPos)) ? 1 : 0.5;
-  // Mix the traced color with black, based on the ammount of light at the point
-  return Color.Mix(new Color(0, 0, 0, 255), tracedColor, lightLevel);
+  // Claculate the distance between the point and the current light
+  var distancePointToLight = Vector.Distance(hit.point, settings.lights[0].position);
+  // Check if the light form the current light reach the point, by checking if a surface is between the light and the point
+  var isLitByLight = lightingRayHit == null || lightingRayHit.distance + 0.001 >= distancePointToLight;
+  // If the point is lit, the brightness is calculated using the inverse square law, otherwise the brighness is 0
+  var brightness = isLitByLight ? Light.GetInverseSquare(distancePointToLight) : 0;
+  // Mix the traced color with black, based on the ammount of light hitting the point
+  return Color.Mix(new Color(0, 0, 0, 255), tracedColor, brightness);
 }
 
 // Cast a ray from an origin in a given direction. If it hits the triangle, returns the hitPoint, otherwise returns null.
