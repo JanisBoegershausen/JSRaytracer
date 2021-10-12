@@ -157,16 +157,21 @@ function Trace(origin, direction, iteration, debugLog) {
     return rayColor;
   }
 
-  // Cast a ray from the light source to the point in space we are calculating the lighting for
-  var lightingRayDirection = Vector.Sub(hit.point, settings.lights[0].position).normalized();
-  var lightingRayOrigin = settings.lights[0].position;
-  var lightingRayHit = CastRay(lightingRayOrigin, lightingRayDirection);
-  // Claculate the distance between the point and the current light
-  var distancePointToLight = Vector.Distance(hit.point, settings.lights[0].position);
-  // Check if the light form the current light reach the point, by checking if a surface is between the light and the point
-  var isLitByLight = lightingRayHit == null || lightingRayHit.distance + 0.001 >= distancePointToLight;
-  // If the point is lit, the brightness is calculated using the inverse square law, otherwise the brighness is 0
-  var brightness = isLitByLight ? Light.GetInverseSquare(distancePointToLight) : 0;
+  var brightness = 0;
+  for (let i = 0; i < settings.lights.length; i++) {
+    const light = settings.lights[i];
+    // Cast a ray from the light source to the point in space we are calculating the lighting for
+    var lightingRayDirection = Vector.Sub(hit.point, light.position).normalized();
+    var lightingRayOrigin = light.position;
+    var lightingRayHit = CastRay(lightingRayOrigin, lightingRayDirection);
+    // Claculate the distance between the point and the current light
+    var distancePointToLight = Vector.Distance(hit.point, light.position);
+    // Check if the light form the current light reach the point, by checking if a surface is between the light and the point
+    var isLitByLight = lightingRayHit == null || lightingRayHit.distance + 0.001 >= distancePointToLight;
+    // If the point is lit, the brightness is calculated using the inverse square law, otherwise the brighness is 0
+    brightness += isLitByLight ? Light.GetInverseSquare(distancePointToLight) : 0;
+  }
+  
   // Mix the traced color with black, based on the ammount of light hitting the point
   return Color.Mix(new Color(0, 0, 0, 255), tracedColor, brightness);
 }

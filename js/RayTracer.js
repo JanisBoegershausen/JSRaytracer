@@ -39,7 +39,8 @@ function setup() {
   triangles = triangles.concat(Square(new Vector(-30, groundY, -30), new Vector(30, groundY, -30), new Vector(30, groundY, 30), new Vector(-30, groundY, 30), "Ground"));
 
   // Create light
-  sceneLights.push(new Light(new Vector(0, 0.5, -1.5), 1));
+  sceneLights.push(new Light(new Vector(-0.5, 0.5, -1.5), 1));
+  sceneLights.push(new Light(new Vector(1.0, 0.5, -0.5), 1));
 
   // Create one worker for each tile
   var tileWidth = Math.floor(resolution.x / horizontalTileCount);
