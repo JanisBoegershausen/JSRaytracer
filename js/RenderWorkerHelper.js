@@ -3,8 +3,8 @@ function InitializeWorkers() {
   KillAllWorkers();
 
   // Create one worker for each tile
-  var tileWidth = Math.floor(resolution.x / horizontalTileCount);
-  var tileHeight = Math.floor(resolution.y / verticalTileCount);
+  var tileWidth = Math.ceil(resolution.x / horizontalTileCount);
+  var tileHeight = Math.ceil(resolution.y / verticalTileCount);
   for (var x = 0; x < horizontalTileCount; x += 1) {
     for (var y = 0; y < verticalTileCount; y += 1) {
       CreateWorker(Math.floor(x * tileWidth), Math.floor(y * tileHeight), tileWidth, tileHeight);

@@ -34,13 +34,14 @@
     <div id="raytracer-area" style="display: flex; width: max-content; margin: auto">
       <div style="width: 500px; height: 500px; margin: 20px" id="rayTracer-canvas"></div>
       <div id="settings-area" style="margin: 20px">
+        <div style="display: flex">Realtime: <input type="checkbox" id="realtime-toggle" onclick="OnRealtimeButtonClick(this)"/></div>
         <div style="display: flex">
           Resolution:
           <input id = "resolution-slider" type="range" / oninput="OnResolutionSliderChange(this)"> 
           <div id="resolution-display">100</div>
         </div>
         <button id="init-workers-button" onclick="OnInitializeButtonClick()">Initialize Workers</button>
-        <button id="start-render-button" onclick="StartRenderFrame()">Render</button>
+        <button id="start-render-button" onclick="StartRender()">Render</button>
       </div>
     </div>
   </textSection>

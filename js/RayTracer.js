@@ -1,5 +1,5 @@
 // Resolution of the raytracer.
-var resolution = { x: 500, y: 500 };
+var resolution = { x: 512, y: 512 };
 
 // List of all triangles that are rendered
 var triangles = [];
@@ -12,8 +12,12 @@ var cameraFovMult = 1.5;
 
 // Worker settings and data
 var renderWorkers = [];
-var horizontalTileCount = 1;
-var verticalTileCount = 1;
+var horizontalTileCount = 3;
+var verticalTileCount = 3;
+
+var settings = {
+  useRealtimeMode: false
+}
 
 var enviromentTexture;
 
@@ -47,7 +51,10 @@ function setup() {
   SendAllData();
 
   // Start rendering the scene once
-  StartRenderFrame();
+  StartRender();
+
+  // Set realtime toggle to false on start
+  document.getElementById("realtime-toggle").checked = false;
 
   // Set resolution slider start value
   document.getElementById("resolution-slider").value = 100;
@@ -59,12 +66,13 @@ function draw() {
   // Todo: Show info about the renderer using html elements
 }
 
-// Tell all workers to render their dedicated area once, send the result to be drawn and then wait for new messages.
-function StartRenderFrame() {
+// Tell all workers to render their dedicated area, send the result to be drawn and then wait for new messages.
+// If settings.useRealtime == true, this starts a loop
+function StartRender() {
   background(0);
   for (var i = 0; i < renderWorkers.length; i += 1) {
     renderWorkers[i].postMessage({
-      type: "RenderOnce",
+      type: settings.useRealtimeMode ? "StartLoop" : "RenderOnce",
     });
   }
 }
@@ -73,14 +81,13 @@ function StartRenderFrame() {
 // Only the pixels the worker is tasked to render are set.
 function OnRenderWorkerDone(pixels) {
   // Iterate through all pixels in the recieved array
-  console.log(pixels.data.length);
-  for (var x = 0; x < pixels.data.length; x += 1) {
-    for (var y = 0; y < pixels.data[0].length; y += 1) {
+  for (var x = 0; x < resolution.x; x += 1) {
+    for (var y = 0; y < resolution.y; y += 1) {
       // Check if the pixel is set
       if (pixels.data[x] != null && pixels.data[x][y] != null) {
         // Only if the pixel is set, draw it. Otherwise don't do anything
         var color = pixels.data[x][y];
-        DrawPixel(x, y, color.r, color.g, color.b, color.a, pixels.data.length, pixels.data[0].length);
+        DrawPixel(x, y, color.r, color.g, color.b, color.a, resolution.x, resolution.y);
       }
     }
   }

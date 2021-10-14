@@ -35,8 +35,10 @@ self.addEventListener("message", (e) => {
   } else if (e.data.type == "StartLoop") {
     // Start rendering loop. Random delay, so that the workers always complete their area at different
     // times and dont block each other when sending the pixels to the main script.
+    settings.useRealtimeMode = true;
     setTimeout(StartRenderLoop, RandomInRange(0, 50));
   } else if (e.data.type == "RenderOnce") {
+    settings.useRealtimeMode = false;
     setTimeout(RenderFrame, RandomInRange(0, 50));
   } else if (e.data.type == "SetTriangles") {
     SetTrianglesFromObjArray(e.data.triangles);
@@ -94,9 +96,9 @@ function RenderFrame() {
 function RenderPixel(x, y) {
   if (settings.useRealtimeMode) {
     // Raytracer skips random pixels based on their distance from the center for better performance. (Adds noise!)
-    var pixelDistanceFromCenterSqrt = Math.abs((x - resolution.x / 2) / resolution.x) + Math.abs((y - resolution.y / 2) / resolution.y);
-    var chanceToSkipPixel = 99.5;
-    if (random(0, 100) < chanceToSkipPixel * pixelDistanceFromCenterSqrt) {
+    var pixelDistanceFromCenterSqrt = Math.abs((x - settings.resolution.x / 2) / settings.resolution.x) + Math.abs((y - settings.resolution.y / 2) / settings.resolution.y);
+    var chanceToSkipPixel = 99.9;
+    if (RandomInRange(0, 100) < chanceToSkipPixel * pixelDistanceFromCenterSqrt) {
       return {
         r: 0,
         g: 0,
