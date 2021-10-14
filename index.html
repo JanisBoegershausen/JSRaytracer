@@ -36,8 +36,18 @@
   <textSection>
     <div>Canvas</div>
     <div id="raytracer-area">
+      <div id="camera-settings" style="width: 30%; margin: 20px">
+        <div>Camera Settings</div>
+        <div style="width: 50px; display: grid; margin: 20px">
+          <button style="width:50px; height:50px; margin:0px; grid-column: 2; grid-row: 1" onclick="MoveCamera(new Vector(    0, 0, -0.25))">🡅</button>
+          <button style="width:50px; height:50px; margin:0px; grid-column: 1; grid-row: 2" onclick="MoveCamera(new Vector(-0.25, 0,     0))">🡄</button>
+          <button style="width:50px; height:50px; margin:0px; grid-column: 3; grid-row: 2" onclick="MoveCamera(new Vector( 0.25, 0,     0))">🡆</button>
+          <button style="width:50px; height:50px; margin:0px; grid-column: 2; grid-row: 3" onclick="MoveCamera(new Vector(    0, 0,  0.25))">🡇</button>
+        </div>
+      </div>
       <div id="rayTracer-canvas"></div>
-      <div id="settings-area" style="width:30%; margin: 20px">
+      <div id="settings-area" style="width: 30%; margin: 20px">
+        <div>Settings</div>
         <div>Realtime: <input type="checkbox" id="realtime-toggle" onclick="OnRealtimeButtonClick(this)" /></div>
         <div>
           <div>Tiles:</div>
@@ -48,7 +58,7 @@
           </select>
         </div>
         <div>
-          <div>Resolution: </div>
+          <div>Resolution:</div>
           <input id="resolution-slider" type="range" oninput="OnResolutionSliderChange(this)" />
           <div id="resolution-display">100px</div>
         </div>
@@ -67,14 +77,26 @@
     </div>
   </textSection>
   <textSection>
+    <div>Realtime-Mode</div>
+    <div style="font-size: 20px; margin-top: 10px">
+      This raytracer can be toggled between rendering a single image and rendering in real-time. <br />
+      If realtime-mode is disabled, clicking the "Render"-Button, renders the image once. If realtime-mode is enabled, however, <br />
+      the workers will continuously render the scene, with some performance options enabled. This allows for somewhat fluid movement at the cost of <br />
+      introducing noise. For now, this is mainly intended as a preview for moving the camera to a new location, to then render using the standard mode. <br>
+      <br>
+      <b style="color:darkorange">Warning: Realtime-Mode, especially at high resolutions, can slow down your browser!</b>
+    </div>
+  </textSection>
+  <textSection>
     <div>Tiling & Web-Workers</div>
     <div style="font-size: 20px; margin-top: 10px">
-      Tiling describes splitting the image into multiple smaller rectangles and rendering them seperatly. This allows us to render the image using paralelism. Right now, the ammount of tiles is set to 2x2, so 4 tiles in total. <br />
+      Tiling describes splitting the image into multiple smaller rectangles and rendering them seperatly. This allows us to render the image using paralelism. <br />
+      Right now, the ammount of tiles is set to 2x2, so 4 tiles in total. <br />
       For each of these tiles, a webworker is created, that renders the dedicated section and sends it back to the main script.
       <br />
       <br />
-      It is important to note here, that while using more tiles will decrease the time it takes to render an image, it will also increase the time it takes to initialize the workers. That's because we have to send the needed data (including the relatively big environment texture) to each of the
-      workers.
+      It is important to note here, that while using more tiles will decrease the time it takes to render an image, it will also increase the time it takes to <br />
+      initialize the workers. That's because we have to send the needed data (including the relatively big environment texture) to each of the workers.
     </div>
   </textSection>
   <textSection>

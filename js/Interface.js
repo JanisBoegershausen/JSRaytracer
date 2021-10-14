@@ -39,3 +39,8 @@ function OnRealtimeButtonClick(element) {
   settings.useRealtimeMode = element.checked;
   document.getElementById("start-render-button").disabled = true;
 }
+
+function MoveCamera(moveDelta) {
+  settings.cameraPosition = Vector.Add(settings.cameraPosition, moveDelta);
+  SendCameraData();
+}

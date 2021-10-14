@@ -1,3 +1,78 @@
+input[type="checkbox"] {
+  appearance: none;
+  display: flex;
+  align-items: center;
+}
+
+input[type="checkbox"]::after {
+  content: " ";
+  cursor: pointer;
+
+  border-radius: 10px;
+
+  border-color: #30323d;
+  background-color: #414554;
+
+  font-family: Source Code Pro;
+  font-size: large;
+  font-weight: 600;
+
+  display: inline-block;
+  height: 25px;
+  width: 25px;
+  align-self: center;
+
+  padding: 1px 1px 1px 1px;
+  margin: auto;
+}
+
+input[type="checkbox"]:checked::after {
+  content: "✓";
+  text-align: center;
+  text-justify: center;
+  background-color: #0cce6b;
+}
+
+select {
+  cursor: pointer;
+
+  border-radius: 10px;
+
+  border-color: #30323d;
+  background-color: #414554;
+  color: #0cce6b;
+
+  font-family: Source Code Pro;
+  font-size: large;
+  font-weight: 600;
+
+  padding: 4px 6px 4px 6px;
+}
+
+button {
+  cursor: pointer;
+
+  border-radius: 10px;
+
+  border-color: #30323d;
+  background-color: #414554;
+  color: #0cce6b;
+
+  font-family: Source Code Pro;
+  font-size: large;
+  font-weight: 600;
+
+  padding: 4px 6px 4px 6px;
+  margin: 10px;
+}
+
+button:disabled {
+  color: #24262e;
+  background-color: #30323d;
+  border-color: #414554;
+  cursor: default;
+}
+
 #raytracer-area {
   display: flex;
   justify-content: center;
