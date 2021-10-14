@@ -42,26 +42,21 @@ function setup() {
   sceneLights.push(new Light(new Vector(-0.5, 0.5, -1.5), 1));
   sceneLights.push(new Light(new Vector(1.0, 0.5, -0.5), 1));
 
-  // Create one worker for each tile
-  var tileWidth = Math.floor(resolution.x / horizontalTileCount);
-  var tileHeight = Math.floor(resolution.y / verticalTileCount);
-  for (var x = 0; x < horizontalTileCount; x += 1) {
-    for (var y = 0; y < verticalTileCount; y += 1) {
-      CreateWorker(Math.floor(x * tileWidth), Math.floor(y * tileHeight), tileWidth, tileHeight);
-    }
-  }
+  InitializeWorkers();
+
+  SendAllData();
 
   // Start rendering the scene once
   StartRenderFrame();
+
+  // Set resolution slider start value
+  document.getElementById("resolution-slider").value = 100;
+  OnResolutionSliderChange(document.getElementById("resolution-slider"));
+  document.getElementById("start-render-button").disabled = false;
 }
 
 function draw() {
   // Todo: Show info about the renderer using html elements
-
-  // Rerender using the enter key
-  if (keyIsDown(13)) {
-    StartRenderFrame();
-  }
 }
 
 // Tell all workers to render their dedicated area once, send the result to be drawn and then wait for new messages.
@@ -74,92 +69,33 @@ function StartRenderFrame() {
   }
 }
 
-// Create a worker which is dedicated to rendering the given rectangle.
-function CreateWorker(x, y, w, h) {
-  // Create a new worker from the RenderWorker.js script and add it to our list of workers
-  var worker = new Worker("js/RenderWorker.js");
-  renderWorkers.push(worker);
-
-  // Assign the function which handles messages that are send from the worker to this script
-  worker.onmessage = OnRenderWorkerDone;
-
-  // Send resolution to the worker
-  worker.postMessage({
-    type: "SetResolution",
-    resolution: resolution,
-  });
-
-  // Send the workers area to the worker
-  worker.postMessage({
-    type: "AssignArea",
-    x: x,
-    y: y,
-    w: w,
-    h: h,
-  });
-
-  // Send the enviromentTexture to the worker
-  worker.postMessage({
-    type: "SetEnviroment",
-    enviromentTexture: enviromentTexture,
-  });
-
-  // Send the triangles to the worker
-  worker.postMessage({
-    type: "SetTriangles",
-    triangles: triangles,
-  });
-
-  // Send the lights to the worker
-  worker.postMessage({
-    type: "SetLights",
-    lights: sceneLights,
-  });
-
-  // Send the camera data to the worker
-  worker.postMessage({
-    type: "SetCamData",
-    camPos: Vector.Mult(camPos, new Vector(1, 1, 1)), // HERE I INVERT THE VECTOR! THIS IS BECAUSE OTHERWISE THE SCENE IS INVERTED! FIND OUT WHY!!!
-    cameraFovMult: cameraFovMult,
-  });
-}
-
-// Sends the current camera data (position) to all workers
-function UpdateCameraDataForAllWorkers() {
-  for (var i = 0; i < renderWorkers.length; i += 1) {
-    renderWorkers[i].postMessage({
-      type: "SetCamPos",
-      camPos: camPos,
-    });
-  }
-}
-
 // Called by a renderworker. Pixels is a 2d array of colors (rgba) of the entire screen (resolution.x, resolution.y).
 // Only the pixels the worker is tasked to render are set.
 function OnRenderWorkerDone(pixels) {
   // Iterate through all pixels in the recieved array
-  for (var x = 0; x < resolution.x; x += 1) {
-    for (var y = 0; y < resolution.x; y += 1) {
+  console.log(pixels.data.length);
+  for (var x = 0; x < pixels.data.length; x += 1) {
+    for (var y = 0; y < pixels.data[0].length; y += 1) {
       // Check if the pixel is set
       if (pixels.data[x] != null && pixels.data[x][y] != null) {
         // Only if the pixel is set, draw it. Otherwise don't do anything
         var color = pixels.data[x][y];
-        DrawPixel(x, y, color.r, color.g, color.b, color.a);
+        DrawPixel(x, y, color.r, color.g, color.b, color.a, pixels.data.length, pixels.data[0].length);
       }
     }
   }
 }
 
 // Draw a rectangle given a point in scaled coordinates and its color. (If resolutionWidth == 10, x = 9 would be at the far right end of the screen)
-function DrawPixel(x, y, r, g, b, a) {
+function DrawPixel(x, y, r, g, b, a, resolutionX, resolutionY) {
   fill(r, g, b, a);
-  strokeWeight(0);
-  noStroke();
+  stroke(r, g, b, a);
+  strokeWeight(1);
 
-  posX = (x / resolution.x) * width;
-  posY = (y / resolution.y) * height;
+  posX = (x / resolutionX) * width;
+  posY = (y / resolutionY) * height;
 
-  rect(posX, posY, width / resolution.x, width / resolution.y);
+  rect(posX, posY, width / resolutionX, width / resolutionY);
 }
 
 // Canvas helper functions:
