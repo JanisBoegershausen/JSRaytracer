@@ -12,8 +12,8 @@ var cameraFovMult = 1.5;
 
 // Worker settings and data
 var renderWorkers = [];
-var horizontalTileCount = 3;
-var verticalTileCount = 3;
+var horizontalTileCount = 2;
+var verticalTileCount = 2;
 
 var settings = {
   useRealtimeMode: false
@@ -52,6 +52,9 @@ function setup() {
 
   // Start rendering the scene once
   StartRender();
+
+  // Reset tile selector
+  document.getElementById("tile-selector").value = "2"
 
   // Set realtime toggle to false on start
   document.getElementById("realtime-toggle").checked = false;

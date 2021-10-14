@@ -4,6 +4,12 @@ function OnInitializeButtonClick(element) {
   document.getElementById("start-render-button").disabled = false;
 }
 
+function OnTileSelection() {
+  horizontalTileCount = parseInt(document.getElementById("tile-selector").value);
+  verticalTileCount = parseInt(document.getElementById("tile-selector").value);
+  document.getElementById("start-render-button").disabled = true;
+}
+
 function OnResolutionSliderChange(element) {
   // Stop any renderWorkers, so there are no conflicts from the resolution change
   KillAllWorkers();
