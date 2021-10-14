@@ -3,10 +3,10 @@ function InitializeWorkers() {
   KillAllWorkers();
 
   // Create one worker for each tile
-  var tileWidth = Math.ceil(resolution.x / horizontalTileCount);
-  var tileHeight = Math.ceil(resolution.y / verticalTileCount);
-  for (var x = 0; x < horizontalTileCount; x += 1) {
-    for (var y = 0; y < verticalTileCount; y += 1) {
+  var tileWidth = Math.ceil(resolution.x / settings.horizontalTileCount);
+  var tileHeight = Math.ceil(resolution.y / settings.verticalTileCount);
+  for (var x = 0; x < settings.horizontalTileCount; x += 1) {
+    for (var y = 0; y < settings.verticalTileCount; y += 1) {
       CreateWorker(Math.floor(x * tileWidth), Math.floor(y * tileHeight), tileWidth, tileHeight);
     }
   }
@@ -57,7 +57,7 @@ function SendCameraData() {
   for (var i = 0; i < renderWorkers.length; i += 1) {
     renderWorkers[i].postMessage({
       type: "SetCamData",
-      camPos: camPos,
+      camPos: settings.cameraPosition,
       cameraFovMult: cameraFovMult,
     });
   }
@@ -68,7 +68,7 @@ function SendLights() {
   for (var i = 0; i < renderWorkers.length; i += 1) {
     renderWorkers[i].postMessage({
       type: "SetLights",
-      lights: sceneLights,
+      lights: settings.sceneLights,
     });
   }
 }

@@ -1,0 +1,15 @@
+#raytracer-area {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+#rayTracer-canvas {
+  width: 500px;
+  height: 500px;
+  margin: 20px;
+}
+
+#settings-area div {
+  display: flex;
+}

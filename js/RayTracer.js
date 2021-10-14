@@ -4,19 +4,25 @@ var resolution = { x: 512, y: 512 };
 // List of all triangles that are rendered
 var triangles = [];
 
-var sceneLights = [];
 
 // Camera settings and data
-var camPos = null;
+
 var cameraFovMult = 1.5;
 
 // Worker settings and data
 var renderWorkers = [];
-var horizontalTileCount = 2;
-var verticalTileCount = 2;
 
 var settings = {
-  useRealtimeMode: false
+  // Raytracer settings
+  useRealtimeMode: false,
+  horizontalTileCount: 2,
+  verticalTileCount: 2,
+  
+  // Camera
+  cameraPosition: null,
+
+  // Scene
+  sceneLights: []
 }
 
 var enviromentTexture;
@@ -30,7 +36,7 @@ function setup() {
   enviromentTexture.LoadFromImage("hdri");
 
   // Set the camera position to the center of the world
-  camPos = new Vector(0, 1, 1);
+  settings.cameraPosition = new Vector(0, 1, 1);
 
   // Square facing camera
   triangles = triangles.concat(Square(new Vector(-1, 0, -3), new Vector(-1, 1, -4), new Vector(1, 1, -4), new Vector(1, 0, -3), "Facing Camera"));
@@ -43,26 +49,15 @@ function setup() {
   triangles = triangles.concat(Square(new Vector(-30, groundY, -30), new Vector(30, groundY, -30), new Vector(30, groundY, 30), new Vector(-30, groundY, 30), "Ground"));
 
   // Create light
-  sceneLights.push(new Light(new Vector(-0.5, 0.5, -1.5), 1));
-  sceneLights.push(new Light(new Vector(1.0, 0.5, -0.5), 1));
+  settings.sceneLights.push(new Light(new Vector(-0.5, 0.5, -1.5), 1));
+  settings.sceneLights.push(new Light(new Vector(1.0, 0.5, -0.5), 1));
+
+  InitializeInterface();
 
   InitializeWorkers();
-
   SendAllData();
-
   // Start rendering the scene once
   StartRender();
-
-  // Reset tile selector
-  document.getElementById("tile-selector").value = "2"
-
-  // Set realtime toggle to false on start
-  document.getElementById("realtime-toggle").checked = false;
-
-  // Set resolution slider start value
-  document.getElementById("resolution-slider").value = 100;
-  OnResolutionSliderChange(document.getElementById("resolution-slider"));
-  document.getElementById("start-render-button").disabled = false;
 }
 
 function draw() {

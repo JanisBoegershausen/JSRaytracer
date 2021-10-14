@@ -39,7 +39,7 @@ self.addEventListener("message", (e) => {
     setTimeout(StartRenderLoop, RandomInRange(0, 50));
   } else if (e.data.type == "RenderOnce") {
     settings.useRealtimeMode = false;
-    setTimeout(RenderFrame, RandomInRange(0, 50));
+    setTimeout(RenderFrame, RandomInRange(0, 100));
   } else if (e.data.type == "SetTriangles") {
     SetTrianglesFromObjArray(e.data.triangles);
   }else if (e.data.type == "SetLights") {
@@ -59,7 +59,7 @@ self.addEventListener("message", (e) => {
 
 // Start a renderloop on this worker, repeating the RenderFrame function.
 function StartRenderLoop() {
-  setInterval(RenderFrame, 50);
+  setInterval(RenderFrame, 100);
 }
 
 // Since objects loose their type when send to a worker, restore the type of the triangles and store them in the triangles array.

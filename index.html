@@ -1,10 +1,14 @@
 <head>
   <title>Raytracer</title>
 
+  <!-- Load stylesheets -->
   <link rel="stylesheet" href="https://janisboegershausen.github.io/main.css" />
+  <link rel="stylesheet" href="css/style.css" />
 
+  <!-- Import p5.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
 
+  <!-- Import my scripts-->
   <script language="javascript" type="text/javascript" src="https://janisboegershausen.github.io/SyntaxHighlighter.js"></script>
   <script language="javascript" type="text/javascript" src="https://janisboegershausen.github.io/CommonUtilities.js/Mathmatics.js"></script>
   <script language="javascript" type="text/javascript" src="https://janisboegershausen.github.io/CommonUtilities.js/Color.js"></script>
@@ -19,8 +23,8 @@
   <script language="javascript" type="text/javascript" src="js/RenderWorkerHelper.js"></script>
   <script language="javascript" type="text/javascript" src="js/Interface.js"></script>
 
+  <!-- Run the SyntaxHighlighter once the page has completly loaded -->
   <script>
-    // Run code stylizer once the code has loaded
     window.addEventListener("load", SyntaxHighlightElementsOnPage);
   </script>
 </head>
@@ -28,24 +32,25 @@
 <body>
   <returnHomeButton onclick="window.open('https://janisboegershausen.github.io/');"></returnHomeButton>
   <headline> Raytracer </headline>
-  <textSection> A simple <coloredText style="color: tomato">(WIP)</coloredText> raytracer written in javascript. Press enter to start a new render. </textSection>
+  <textSection> A simple <a style="color: tomato">(WIP)</a> raytracer written in javascript. </textSection>
   <textSection>
-    Canvas
-    <div id="raytracer-area" style="display: flex; width: max-content; margin: auto">
-      <div style="width: 500px; height: 500px; margin: 20px" id="rayTracer-canvas"></div>
-      <div id="settings-area" style="margin: 20px">
-        <div style="display: flex">Realtime: <input type="checkbox" id="realtime-toggle" onclick="OnRealtimeButtonClick(this)" /></div>
-        <div style="display: flex">
-          Tiles:
+    <div>Canvas</div>
+    <div id="raytracer-area">
+      <div id="rayTracer-canvas"></div>
+      <div id="settings-area" style="width:30%; margin: 20px">
+        <div>Realtime: <input type="checkbox" id="realtime-toggle" onclick="OnRealtimeButtonClick(this)" /></div>
+        <div>
+          <div>Tiles:</div>
           <select name="Tile-Count" id="tile-selector" oninput="OnTileSelection(this)">
             <option value="1">1x1</option>
             <option value="2">2x2</option>
             <option value="3">3x3</option>
           </select>
         </div>
-        <div style="display: flex">
-          Resolution: <input id = "resolution-slider" type="range" / oninput="OnResolutionSliderChange(this)">
-          <div id="resolution-display">100</div>
+        <div>
+          <div>Resolution: </div>
+          <input id="resolution-slider" type="range" oninput="OnResolutionSliderChange(this)" />
+          <div id="resolution-display">100px</div>
         </div>
         <button id="init-workers-button" onclick="OnInitializeButtonClick()">Initialize Workers</button>
         <button id="start-render-button" onclick="StartRender()">Render</button>
@@ -62,14 +67,18 @@
     </div>
   </textSection>
   <textSection>
-    Tiling & Web-Workers
+    <div>Tiling & Web-Workers</div>
     <div style="font-size: 20px; margin-top: 10px">
-      Tiling describes splitting the image into multiple smaller rectangles and rendering them seperatly. This allows us to render the image using paralelism. Right now, the ammount of tiles is set to 4x4, so 16 tiles in total. <br />
+      Tiling describes splitting the image into multiple smaller rectangles and rendering them seperatly. This allows us to render the image using paralelism. Right now, the ammount of tiles is set to 2x2, so 4 tiles in total. <br />
       For each of these tiles, a webworker is created, that renders the dedicated section and sends it back to the main script.
+      <br />
+      <br />
+      It is important to note here, that while using more tiles will decrease the time it takes to render an image, it will also increase the time it takes to initialize the workers. That's because we have to send the needed data (including the relatively big environment texture) to each of the
+      workers.
     </div>
   </textSection>
   <textSection>
-    Enviroment
+    <div>Enviroment</div>
     <div style="font-size: 20px; margin-top: 10px">
       Since I became a bit bored of the empty background behind the square, I implemented a skybox. <br />
       To achieve this, each ray that does not hit a triangle, samples an HDRI, which is loaded in advance <br />
@@ -77,12 +86,6 @@
       <br />
       The sampling is done by converting the direction of a ray to UVs through calculating the around the y axis and the y component of the direction:
       <br />
-      <div class="codeSection">
-        Sample(direction) { // Normalize direction direction = direction.normalized(); // Calculate angle around the Y Axis using formula for angles of 2d vectors. This way we ignore the z component completly. var a = direction.x * Vector.forward.x + direction.z * Vector.forward.z; var b =
-        Math.sqrt(Math.pow(direction.x, 2) + Math.pow(direction.z, 2)) * Math.sqrt(Math.pow(Vector.forward.x, 2) + Math.pow(Vector.forward.z, 2)); var angleAlongY = a / b; angleAlongY = Math.acos(angleAlongY); // Convert angle from radians to degrees angleAlongY = angleAlongY * (180 / Math.PI); //
-        Make angle go from 0 to 360 clockwise instead of from 0 to 180 in both directions if (direction.x < 0) { angleAlongY = angleAlongY * -1 + 360; } // Calculate uv in range from 0 to 1 var uv = { x: angleAlongY / 360, y: (direction.y + 1) / 2, // This might cause distortion towards the horizon
-        }; // Calculate textureCoordinate in range from 0 to width/height var textureCoordinate = { x: Math.floor(uv.x * this.width), y: Math.floor(uv.y * this.height), }; // Return the sampled color return this.pixels[textureCoordinate.x][textureCoordinate.y]; }
-      </div>
       <br />
       This is the used HDRI from
       <a href="https://polyhaven.com/hdris">Polyhaven</a>:
