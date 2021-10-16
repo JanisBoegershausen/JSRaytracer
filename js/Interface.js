@@ -24,6 +24,11 @@ function OnTileSelection() {
   document.getElementById("start-render-button").disabled = true;
 }
 
+function OnFovSliderChange(element) {
+  cameraFovMult = Remap(element.value, 0, 100, 0.2, 1.5);
+  SendCameraData();
+}
+
 function OnResolutionSliderChange(element) {
   // Stop any renderWorkers, so there are no conflicts from the resolution change
   KillAllWorkers();

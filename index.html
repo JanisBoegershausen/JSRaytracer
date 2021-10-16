@@ -44,6 +44,8 @@
           <button style="width:50px; height:50px; margin:0px; grid-column: 3; grid-row: 2" onclick="MoveCamera(new Vector( 0.25, 0,     0))">🡆</button>
           <button style="width:50px; height:50px; margin:0px; grid-column: 2; grid-row: 3" onclick="MoveCamera(new Vector(    0, 0,  0.25))">🡇</button>
         </div>
+        <div>FOV: </div>
+        <input id="fov-slider" type="range" min="0" max="100" onmouseup="OnFovSliderChange(this)" />
       </div>
       <div id="rayTracer-canvas"></div>
       <div id="settings-area" style="width: 30%; margin: 20px">
