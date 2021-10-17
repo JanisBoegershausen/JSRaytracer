@@ -1,16 +1,10 @@
 // Resolution of the raytracer.
 var resolution = { x: 512, y: 512 };
 
-// List of all triangles that are rendered
 var triangles = [];
-
-
-// Camera settings and data
-
-var cameraFovMult = 1.5;
-
-// Worker settings and data
 var renderWorkers = [];
+var enviromentTexture;
+var sceneLights = [];
 
 var settings = {
   // Raytracer settings
@@ -21,12 +15,8 @@ var settings = {
   
   // Camera
   cameraPosition: null,
-
-  // Scene
-  sceneLights: []
+  cameraFovMult: 1.5,
 }
-
-var enviromentTexture;
 
 function setup() {
   // Create a new canvas which is used by the raytracer
@@ -50,13 +40,16 @@ function setup() {
   triangles = triangles.concat(Square(new Vector(-30, groundY, -30), new Vector(30, groundY, -30), new Vector(30, groundY, 30), new Vector(-30, groundY, 30), "Ground"));
 
   // Create light
-  settings.sceneLights.push(new Light(new Vector(-0.5, 0.5, -1.5), 1));
-  settings.sceneLights.push(new Light(new Vector(1.0, 0.5, -0.5), 1));
+  sceneLights.push(new Light(new Vector(-0.5, 0.5, -1.5), 1));
+  sceneLights.push(new Light(new Vector(1.0, 0.5, -0.5), 1));
 
+  // Intitalize the raytracers interface and set the starting values of the inputs
   InitializeInterface();
 
+  // Intitalize the workers and send starting data
   InitializeWorkers();
   SendAllData();
+
   // Start rendering the scene once
   StartRender();
 }
@@ -113,6 +106,7 @@ function InitializeNewCanvas() {
   canvas.parent("rayTracer-canvas");
 }
 
+// Called when the window is resized
 function windowResized() {
   ResizeCanvasToFit();
 }

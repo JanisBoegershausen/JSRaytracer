@@ -1,17 +1,21 @@
 // Import required scripts
-importScripts("https://janisboegershausen.github.io/CommonUtilities.js/Mathmatics.js", "https://janisboegershausen.github.io/CommonUtilities.js/Vector3.js", "https://janisboegershausen.github.io/CommonUtilities.js/Color.js", "Triangle.js", "Light.js", "RayHitInfo.js", "EnviromentTexture.js");
+importScripts("https://janisboegershausen.github.io/CommonUtilities.js/Mathmatics.js", 
+              "https://janisboegershausen.github.io/CommonUtilities.js/Vector3.js", 
+              "https://janisboegershausen.github.io/CommonUtilities.js/Color.js", 
+              "Triangle.js", 
+              "Light.js", 
+              "RayHitInfo.js", 
+              "EnviromentTexture.js");
 
 // Settings contains all data the worker needs for rendering
 settings = {
   // In realtime mode, pixel-skipping is enabled, which enhances performance, but introduces noise!
   useRealtimeMode: false,
 
-  // List of triangles to be rendered (updated by RayTracer)
   triangles: [],
-
   lights: [],
 
-  // Camera settings (updated by RayTracer)
+  // Camera settings
   camPos: null,
   cameraFovMult: 1,
 
@@ -22,9 +26,11 @@ settings = {
   area: { x: 0, y: 0, w: 100, h: 100 },
   resolution: new Vector(100, 100, 0),
 
+  // Count of reflection bounces
   bounces: 5,
 };
 
+// Event listener for when the main script sends a message to this worker
 self.addEventListener("message", (e) => {
   if (e.data.type == "AssignArea") {
     console.log(`Setting area to: x: ${e.data.x}, y: ${e.data.y}, w: ${e.data.w}, h: ${e.data.h}. `);

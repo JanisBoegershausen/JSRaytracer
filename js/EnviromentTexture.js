@@ -5,7 +5,7 @@ class EnviromentTexture {
     this.height = 0;
   }
 
-  // Load the data of an img element with the given id into this EnviromentTexture.
+  // Load the data of an img element with the given id into this EnviromentTexture
   LoadFromImage(imgElementId) {
     // Clear the pixels array
     this.pixels = [];
@@ -17,14 +17,14 @@ class EnviromentTexture {
     // Get a reference to the img element containing the hdri we want to load
     var img = document.getElementById(imgElementId);
 
-    // Set canvas the canvas size to the size of the image
+    // Set the canvas size to the size of the image
     canvas.width = img.naturalWidth;
     canvas.height = img.naturalHeight;
 
-    // Draw the image onto the canvas
+    // Draw the image onto the newly created canvas
     context.drawImage(img, 0, 0);
 
-    // Read the pixels from the canvas
+    // Read the imageData from the canvas
     var imageData = context.getImageData(0, 0, img.naturalWidth, img.naturalHeight);
 
     // Set the dimensions of this EnviromentTexture
@@ -35,6 +35,7 @@ class EnviromentTexture {
     for (var x = 0; x < this.width; x += 1) {
       this.pixels[x] = [];
       for (var y = 0; y < this.height; y += 1) {
+        // The imageData.data array is an array of ints, representing the RGBA values in that order for each pixel
         var colorStartIndex = this.ImageDataArrayIndexFromTextureCoordinate(x, y);
         this.pixels[x][y] = {
           r: imageData.data[colorStartIndex],
@@ -51,12 +52,12 @@ class EnviromentTexture {
     return Math.floor(x + this.width * y) * 4;
   }
 
-  // Get the color in a given direction. 
+  // Get the color of this enviromentTexture when sameling the given direction
   Sample(direction) {
-    // Normalize direction
+    // Normalize the direction
     direction = direction.normalized();
 
-    // Calculate angle around the Y Axis using formula for angles of 2d vectors. This way we ignore the z component completly. 
+    // Calculate the angle around the Y Axis using formula for angles of 2d vectors. This way we ignore the z component completly. 
     var a = direction.x * Vector.forward.x + direction.z * Vector.forward.z;
     var b = Math.sqrt(Math.pow(direction.x, 2) + Math.pow(direction.z, 2)) * Math.sqrt(Math.pow(Vector.forward.x, 2) + Math.pow(Vector.forward.z, 2));
     var angleAlongY = a / b;

@@ -1,6 +1,6 @@
 // Set the interface elements to their starting state
 function InitializeInterface() {
-  // Reset tile selector
+  // Set tile selector start value
   document.getElementById("tile-selector").value = "2";
 
   // Set realtime toggle to false on start
@@ -16,29 +16,40 @@ function InitializeInterface() {
   document.getElementById("start-render-button").disabled = true;
 }
 
+// Callback from "Intitalize Workers" button
 function OnInitializeButtonClick(element) {
   InitializeWorkers();
   SendAllData();
+  // Enable render button, since we are ready to render
   document.getElementById("start-render-button").disabled = false;
 }
 
+// Callback for tile selector
 function OnTileSelection() {
-  settings.horizontalTileCount = parseInt(document.getElementById("tile-selector").value);
-  settings.verticalTileCount = parseInt(document.getElementById("tile-selector").value);
+  var tileCount = parseInt(document.getElementById("tile-selector").value);
+  settings.horizontalTileCount = tileCount;
+  settings.verticalTileCount = tileCount;
+  // Disable render button, because workers need to be initialized
   document.getElementById("start-render-button").disabled = true;
 }
 
+// Callback for FOV slider
 function OnFovSliderChange(element) {
-  cameraFovMult = Remap(element.value, 0, 100, 0.2, 1.5);
+  settings.cameraFovMult = Remap(element.value, 0, 100, 0.2, 1.5);
   SendCameraData();
 }
 
+// Callback for bounce slider
 function OnBounceSliderChange(element) {
+  // Save new bounce count setting
   settings.bounces = element.value;
+  // Update text next to slider
   document.getElementById("bounce-display").textContent = settings.bounces;
+  // Send the new bounce data to the workers
   SendBounceData();
 }
 
+// Callback for resolution slider
 function OnResolutionSliderChange(element) {
   // Stop any renderWorkers, so there are no conflicts from the resolution change
   KillAllWorkers();
@@ -55,7 +66,10 @@ function OnRealtimeButtonClick(element) {
   document.getElementById("start-render-button").disabled = true;
 }
 
+// Move the camera by the given vector
 function MoveCamera(moveDelta) {
+  // Add delta to the current camera position
   settings.cameraPosition = Vector.Add(settings.cameraPosition, moveDelta);
+  // Send new position to the workers
   SendCameraData();
 }
