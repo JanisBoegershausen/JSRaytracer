@@ -6,8 +6,12 @@ function InitializeInterface() {
   // Set realtime toggle to false on start
   document.getElementById("realtime-toggle").checked = false;
 
+  // Set bounce slider start value
+  document.getElementById("bounce-slider").value = 3;
+  OnBounceSliderChange(document.getElementById("bounce-slider"));
+
   // Set resolution slider start value
-  document.getElementById("resolution-slider").value = 100;
+  document.getElementById("resolution-slider").value = 70;
   OnResolutionSliderChange(document.getElementById("resolution-slider"));
   document.getElementById("start-render-button").disabled = true;
 }
@@ -27,6 +31,12 @@ function OnTileSelection() {
 function OnFovSliderChange(element) {
   cameraFovMult = Remap(element.value, 0, 100, 0.2, 1.5);
   SendCameraData();
+}
+
+function OnBounceSliderChange(element) {
+  settings.bounces = element.value;
+  document.getElementById("bounce-display").textContent = settings.bounces;
+  SendBounceData();
 }
 
 function OnResolutionSliderChange(element) {

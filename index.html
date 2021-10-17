@@ -64,6 +64,11 @@
           <input id="resolution-slider" type="range" oninput="OnResolutionSliderChange(this)" />
           <div id="resolution-display">100px</div>
         </div>
+        <div>
+          <div>Bounces:</div>
+          <input id="bounce-slider" type="range" min="0" max="5" oninput="OnBounceSliderChange(this)" />
+          <div id="bounce-display">1</div>
+        </div>
         <button id="init-workers-button" onclick="OnInitializeButtonClick()">Initialize Workers</button>
         <button id="start-render-button" onclick="StartRender()">Render</button>
       </div>

@@ -1,8 +1,5 @@
 // Import required scripts
-importScripts("https://janisboegershausen.github.io/CommonUtilities.js/Mathmatics.js", 
-              "https://janisboegershausen.github.io/CommonUtilities.js/Vector3.js", 
-              "https://janisboegershausen.github.io/CommonUtilities.js/Color.js", 
-              "Triangle.js", "Light.js", "RayHitInfo.js", "EnviromentTexture.js");
+importScripts("https://janisboegershausen.github.io/CommonUtilities.js/Mathmatics.js", "https://janisboegershausen.github.io/CommonUtilities.js/Vector3.js", "https://janisboegershausen.github.io/CommonUtilities.js/Color.js", "Triangle.js", "Light.js", "RayHitInfo.js", "EnviromentTexture.js");
 
 // Settings contains all data the worker needs for rendering
 settings = {
@@ -42,11 +39,13 @@ self.addEventListener("message", (e) => {
     setTimeout(RenderFrame, RandomInRange(0, 100));
   } else if (e.data.type == "SetTriangles") {
     SetTrianglesFromObjArray(e.data.triangles);
-  }else if (e.data.type == "SetLights") {
+  } else if (e.data.type == "SetLights") {
     SetLightsFromObjArray(e.data.lights);
   } else if (e.data.type == "SetCamData") {
     settings.camPos = e.data.camPos;
     settings.cameraFovMult = e.data.cameraFovMult;
+  } else if (e.data.type == "SetBounces") {
+    settings.bounces = e.data.bounces;
   } else if (e.data.type == "SetResolution") {
     settings.resolution = e.data.resolution;
   } else if (e.data.type == "SetEnviroment") {
@@ -173,7 +172,7 @@ function Trace(origin, direction, iteration, debugLog) {
     // If the point is lit, the brightness is calculated using the inverse square law, otherwise the brighness is 0
     brightness += isLitByLight ? Light.GetInverseSquare(distancePointToLight) : 0;
   }
-  
+
   // Mix the traced color with black, based on the ammount of light hitting the point
   return Color.Mix(new Color(0, 0, 0, 255), tracedColor, brightness);
 }

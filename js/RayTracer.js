@@ -17,6 +17,7 @@ var settings = {
   useRealtimeMode: false,
   horizontalTileCount: 2,
   verticalTileCount: 2,
+  bounces: 5,
   
   // Camera
   cameraPosition: null,

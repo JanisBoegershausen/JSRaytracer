@@ -47,6 +47,7 @@ function KillAllWorkers() {
 
 function SendAllData() {
   SendCameraData();
+  SendBounceData();
   SendLights();
   SendTriangles();
   SendEnviroment();
@@ -59,6 +60,15 @@ function SendCameraData() {
       type: "SetCamData",
       camPos: settings.cameraPosition,
       cameraFovMult: cameraFovMult,
+    });
+  }
+}
+
+function SendBounceData() {
+  for (var i = 0; i < renderWorkers.length; i += 1) {
+    renderWorkers[i].postMessage({
+      type: "SetBounces",
+      bounces: settings.bounces
     });
   }
 }
