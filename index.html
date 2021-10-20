@@ -32,19 +32,19 @@
 <body>
   <returnHomeButton onclick="window.open('https://janisboegershausen.github.io/');"></returnHomeButton>
   <headline> Raytracer </headline>
-  <textSection> A simple <a style="color: tomato">(WIP)</a> raytracer written in javascript. </textSection>
+  <textSection> A simple raytracer written in javascript. </textSection>
   <textSection>
     <div>Canvas</div>
     <div id="raytracer-area">
       <div id="camera-settings" style="width: 30%; margin: 20px">
         <div>Camera Settings</div>
         <div style="width: 50px; display: grid; margin: 20px">
-          <button style="width:50px; height:50px; margin:0px; grid-column: 2; grid-row: 1" onclick="MoveCamera(new Vector(    0, 0, -0.25))">🡅</button>
-          <button style="width:50px; height:50px; margin:0px; grid-column: 1; grid-row: 2" onclick="MoveCamera(new Vector(-0.25, 0,     0))">🡄</button>
-          <button style="width:50px; height:50px; margin:0px; grid-column: 3; grid-row: 2" onclick="MoveCamera(new Vector( 0.25, 0,     0))">🡆</button>
-          <button style="width:50px; height:50px; margin:0px; grid-column: 2; grid-row: 3" onclick="MoveCamera(new Vector(    0, 0,  0.25))">🡇</button>
+          <button style="width: 50px; height: 50px; margin: 0px; grid-column: 2; grid-row: 1" onclick="MoveCamera(new Vector(    0, 0, -0.25))">🡅</button>
+          <button style="width: 50px; height: 50px; margin: 0px; grid-column: 1; grid-row: 2" onclick="MoveCamera(new Vector(-0.25, 0,     0))">🡄</button>
+          <button style="width: 50px; height: 50px; margin: 0px; grid-column: 3; grid-row: 2" onclick="MoveCamera(new Vector( 0.25, 0,     0))">🡆</button>
+          <button style="width: 50px; height: 50px; margin: 0px; grid-column: 2; grid-row: 3" onclick="MoveCamera(new Vector(    0, 0,  0.25))">🡇</button>
         </div>
-        <div>FOV: </div>
+        <div>FOV:</div>
         <input id="fov-slider" type="range" min="0" max="100" onmouseup="OnFovSliderChange(this)" />
       </div>
       <div id="rayTracer-canvas"></div>
@@ -80,7 +80,7 @@
       This is a simple raytracer written in JavaScript. You can check out the sourcecode
       <a href="https://github.com/JanisBoegershausen/JSRaytracer">HERE</a>.
       <br />
-      More features will come soon. So far this only renders two triangles using Web-Workers. I plan to add shading and reflections soon.
+      So far, it supports rendering opaque reflective triangles that are lit by pointlights.
     </div>
   </textSection>
   <textSection>
@@ -89,16 +89,16 @@
       This raytracer can be toggled between rendering a single image and rendering in real-time. <br />
       If realtime-mode is disabled, clicking the "Render"-Button, renders the image once. If realtime-mode is enabled, however, <br />
       the workers will continuously render the scene, with some performance options enabled. This allows for somewhat fluid movement at the cost of <br />
-      introducing noise. For now, this is mainly intended as a preview for moving the camera to a new location, to then render using the standard mode. <br>
-      <br>
-      <b style="color:darkorange">Warning: Realtime-Mode, especially at high resolutions, can slow down your browser!</b>
+      introducing noise. For now, this is mainly intended as a preview for moving the camera to a new location, to then render using the standard mode. <br />
+      <br />
+      <b style="color: darkorange">Warning: Realtime-Mode, especially at high resolutions, can slow down your browser!</b>
     </div>
   </textSection>
   <textSection>
     <div>Tiling & Web-Workers</div>
     <div style="font-size: 20px; margin-top: 10px">
-      Tiling describes splitting the image into multiple smaller rectangles and rendering them seperatly. This allows us to render the image using paralelism. <br />
-      Right now, the ammount of tiles is set to 2x2, so 4 tiles in total. <br />
+      Tiling describes splitting the image into multiple smaller rectangles and rendering them separately. This allows us to render the image using parallelism. <br />
+      Right now, the amount of tiles is set to 2x2, so 4 tiles in total. <br />
       For each of these tiles, a webworker is created, that renders the dedicated section and sends it back to the main script.
       <br />
       <br />
@@ -107,13 +107,22 @@
     </div>
   </textSection>
   <textSection>
+    <div>Lighting</div>
+    <div style="font-size: 20px; margin-top: 10px">
+      The lighting implementation is fairly simple. Each time a camera ray hits a surface, the color is multiplied by a calculated brightness factor. <br />
+      The brightness is calculated by iterating through each light in the scene and casting a ray from the light to the sampled point. If the ray is not blocked by another triangle, <br />
+      the brightness from this light, equals the inverse square law mutliplied by the brightness variable of the light. <br />
+      The brightness at the given point then equals the sum of all calculated brightnesses of lights in the scene.
+    </div>
+  </textSection>
+  <textSection>
     <div>Enviroment</div>
     <div style="font-size: 20px; margin-top: 10px">
       Since I became a bit bored of the empty background behind the square, I implemented a skybox. <br />
-      To achieve this, each ray that does not hit a triangle, samples an HDRI, which is loaded in advance <br />
-      and the data is send to all of the workers. <br />
+      To achieve this, each ray that does not hit a triangle samples an HDRI, which is loaded in advance <br />
+      and the data is sent to all of the workers. <br />
       <br />
-      The sampling is done by converting the direction of a ray to UVs through calculating the around the y axis and the y component of the direction:
+      The sampling is done by converting the direction of a ray to UVs through calculating the angle around the y axis and the y component of the direction.
       <br />
       <br />
       This is the used HDRI from
