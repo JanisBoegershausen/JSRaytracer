@@ -3,6 +3,10 @@ A raytracer written in Javascript, supporting reflections, lighting and multithr
 
 https://janisboegershausen.github.io/JSRaytracer/
 
+# Screenshots
+![interface](https://raw.githubusercontent.com/JanisBoegershausen/JSRaytracer/main/promotional/screenshot_1.PNG)
+![render](https://raw.githubusercontent.com/JanisBoegershausen/JSRaytracer/main/promotional/render_1.PNG)
+
 ## Current Progress
 - Triangle rendering
 - Enviroment Texture (HDRI)
